@@ -62,14 +62,21 @@ int thread_running = 0;
 int epfd_thread = -1;
 int epfd_blocking = -1;
 
+extern int odroidc_found;
+
 /************* /sys/class/gpio functions ************/
 int gpio_export(unsigned int gpio)
 {
     int fd, len;
     char str_gpio[4];
 
+  if ( odroidc_found ) {
+    if ((fd = open("/sys/class/aml_gpio/export", O_WRONLY)) < 0)
+        return -1;
+  } else {
     if ((fd = open("/sys/class/gpio/export", O_WRONLY)) < 0)
-       return -1;
+        return -1;
+  }
 
     len = snprintf(str_gpio, sizeof(str_gpio), "%d", gpio);
     write(fd, str_gpio, len);
@@ -83,8 +90,13 @@ int gpio_unexport(unsigned int gpio)
     int fd, len;
     char str_gpio[4];
 
+  if ( odroidc_found ) {
+    if ((fd = open("/sys/class/aml_gpio/unexport", O_WRONLY)) < 0)
+        return -1;
+  } else {
     if ((fd = open("/sys/class/gpio/unexport", O_WRONLY)) < 0)
         return -1;
+  }
 
     len = snprintf(str_gpio, sizeof(str_gpio), "%d", gpio);
     write(fd, str_gpio, len);
@@ -96,8 +108,11 @@ int gpio_unexport(unsigned int gpio)
 int gpio_set_direction(unsigned int gpio, unsigned int in_flag)
 {
     int fd;
-    char filename[34];
+    char filename[38];
 
+  if ( odroidc_found )
+    snprintf(filename, sizeof(filename), "/sys/class/aml_gpio/gpio%d/direction", gpio);
+  else
     snprintf(filename, sizeof(filename), "/sys/class/gpio/gpio%d/direction", gpio);
     if ((fd = open(filename, O_WRONLY)) < 0)
         return -1;
@@ -114,8 +129,11 @@ int gpio_set_direction(unsigned int gpio, unsigned int in_flag)
 int gpio_set_edge(unsigned int gpio, unsigned int edge)
 {
     int fd;
-    char filename[29];
+    char filename[33];
 
+  if ( odroidc_found )
+    snprintf(filename, sizeof(filename), "/sys/class/aml_gpio/gpio%d/edge", gpio);
+  else
     snprintf(filename, sizeof(filename), "/sys/class/gpio/gpio%d/edge", gpio);
 
     if ((fd = open(filename, O_WRONLY)) < 0)
@@ -129,9 +147,12 @@ int gpio_set_edge(unsigned int gpio, unsigned int edge)
 int open_value_file(unsigned int gpio)
 {
     int fd;
-    char filename[30];
+    char filename[34];
 
     // create file descriptor of value file
+  if ( odroidc_found )
+    snprintf(filename, sizeof(filename), "/sys/class/aml_gpio/gpio%d/value", gpio);
+  else
     snprintf(filename, sizeof(filename), "/sys/class/gpio/gpio%d/value", gpio);
     if ((fd = open(filename, O_RDONLY | O_NONBLOCK)) < 0)
         return -1;
@@ -329,13 +350,10 @@ void *poll_thread(void *threadarg)
                 thread_running = 0;
                 pthread_exit(NULL);
             }
-            printf("read file\n");
             g = get_gpio_from_value_fd(events.data.fd);
-            printf("read aaa\n");
             if (g->initial_thread) {     // ignore first epoll trigger
                 g->initial_thread = 0;
             } else {
-                printf("read bbb\n");
                 gettimeofday(&tv_timenow, NULL);
                 timenow = tv_timenow.tv_sec*1E6 + tv_timenow.tv_usec;
                 if (g->bouncetime == -666 || timenow - g->lastcall > g->bouncetime*1000 || g->lastcall == 0 || g->lastcall > timenow) {
