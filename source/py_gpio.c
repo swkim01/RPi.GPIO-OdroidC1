@@ -24,6 +24,8 @@ SOFTWARE.
 #include "c_gpio.h"
 #include "event_gpio.h"
 #include "py_pwm.h"
+#include "py_hwpwm.h"
+#include "py_adc.h"
 #include "cpuinfo.h"
 #include "constants.h"
 #include "common.h"
@@ -944,6 +946,26 @@ PyMODINIT_FUNC initGPIO(void)
 #endif
    Py_INCREF(&PWMType);
    PyModule_AddObject(module, "PWM", (PyObject*)&PWMType);
+
+   // Add HWPWM class
+   if (HWPWM_init_PWMType() == NULL)
+#if PY_MAJOR_VERSION > 2
+      return NULL;
+#else
+      return;
+#endif
+   Py_INCREF(&HWPWMType);
+   PyModule_AddObject(module, "HWPWM", (PyObject*)&HWPWMType);
+
+   // Add ADC Class
+   if (ADC_init_ADCType() == NULL)
+#if PY_MAJOR_VERSION > 2
+      return NULL;
+#else
+      return;
+#endif
+   Py_INCREF(&ADCType);
+   PyModule_AddObject(module, "ADC", (PyObject*)&ADCType);
 
    if (!PyEval_ThreadsInitialized())
       PyEval_InitThreads();

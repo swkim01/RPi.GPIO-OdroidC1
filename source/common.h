@@ -27,6 +27,8 @@ SOFTWARE.
 #define SPI          41
 #define I2C          42
 #define PWM          43
+#define ADC          44
+#define HWPWM        45
 
 int gpio_mode;
 const int pin_to_gpio_rev1[41];

@@ -41,7 +41,7 @@ void define_constants(PyObject *module)
    PyModule_AddObject(module, "IN", input);
 
    pwm = Py_BuildValue("i", PWM);
-   PyModule_AddObject(module, "HARD_PWM", pwm);
+   PyModule_AddObject(module, "SOFT_PWM", pwm);
 
    serial = Py_BuildValue("i", SERIAL);
    PyModule_AddObject(module, "SERIAL", serial);
@@ -51,6 +51,12 @@ void define_constants(PyObject *module)
 
    spi = Py_BuildValue("i", SPI);
    PyModule_AddObject(module, "SPI", spi);
+
+   adc = Py_BuildValue("i", ADC);
+   PyModule_AddObject(module, "ADC", adc);
+
+   hwpwm = Py_BuildValue("i", HWPWM);
+   PyModule_AddObject(module, "HARD_PWM", hwpwm);
 
    unknown = Py_BuildValue("i", MODE_UNKNOWN);
    PyModule_AddObject(module, "UNKNOWN", unknown);

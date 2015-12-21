@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013 Ben Croston
+Copyright (c) 2015 Dong-Seok Lee, Seong-Woo Kim
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -20,27 +20,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#define PY_PUD_CONST_OFFSET 20
-#define PY_EVENT_CONST_OFFSET 30
-
-PyObject *high;
-PyObject *low;
-PyObject *input;
-PyObject *output;
-PyObject *pwm;
-PyObject *serial;
-PyObject *i2c;
-PyObject *spi;
-PyObject *unknown;
-PyObject *board;
-PyObject *bcm;
-PyObject *pud_off;
-PyObject *pud_up;
-PyObject *pud_down;
-PyObject *rising_edge;
-PyObject *falling_edge;
-PyObject *both_edge;
-PyObject *version;
-PyObject *adc;
-PyObject *hwpwm;
-void define_constants(PyObject *module);
+PyTypeObject ADCType;
+PyTypeObject *ADC_init_ADCType(void);
